@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('patientlists', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('dentalclinic_id')->constrained('dentalclinics')->onDelete('cascade');
             $table->unsignedBigInteger('users_id');
             $table->string('name');
             $table->string('gender');
             $table->date('birthday');
             $table->integer('age');
-            $table->string('phone');
             $table->string('address');
+            $table->string('phone');
             $table->string('email');
             $table->timestamps();
 

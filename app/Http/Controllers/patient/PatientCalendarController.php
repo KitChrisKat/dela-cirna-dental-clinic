@@ -2,22 +2,44 @@
 
 namespace App\Http\Controllers\patient;
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\Calendar;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PatientCalendarController extends Controller
 {
+    public function getBookedTimes(Request $request)
+{
+    $date = $request->query('date');
+
+    // Fetch appointments for the given date
+    $bookedTimes = Calendar::whereDate('appointmentdate', $date)
+        ->pluck('appointmenttime')
+        ->toArray();
+
+    return response()->json($bookedTimes);
+}
+
     public function index(){
 
-        $calendars = Calendar::all();
+        // Get the dentalclinic_id from the authenticated user
+        $dentalclinicId = Auth::user()->dentalclinic_id;
+
+        // Retrieve calendars related to the specific dental clinic
+        $calendars = Calendar::where('dentalclinic_id', $dentalclinicId)->paginate(10);
 
         return view('patient.calendar.calendar', compact('calendars'));
     }
 
     public function createCalendar($userId){
 
-        $users = User::findOrFail($userId);
+        // Get the dentalclinic_id from the authenticated user
+        $dentalclinicId = Auth::user()->dentalclinic_id;
+
+        // Retrieve the user and ensure they belong to the same dental clinic
+        $users = User::where('id', $userId)->where('dentalclinic_id', $dentalclinicId)->firstOrFail();
 
         return view('patient.appointment.appointment', compact('users'));
     }
@@ -25,9 +47,11 @@ class PatientCalendarController extends Controller
     public function storeCalendar(Request $request){
 
         $request->validate([
+            'dentalclinic_id' => 'required', 'exists:dentalclinics,id',
             'user_id' => 'required|exists:users,id',
             'appointmentdate' => 'required|date',
-            'appointmenttime' => 'required|date_format:H:i',
+            'appointmenttime' => 'required',
+            'concern' => 'required|string|max:255',
             'name' => 'required|string|max:255',
             'gender' => 'required|string|max:255',
             'birthday' => 'required|date',
@@ -43,10 +67,23 @@ class PatientCalendarController extends Controller
             'relation' => 'nullable|string',
         ]);
 
+        // Check for existing appointment
+        $existingAppointment = Calendar::where([
+            'dentalclinic_id' => $request->input('dentalclinic_id'),
+            'appointmentdate' => $request->input('appointmentdate'),
+            'appointmenttime'=> $request->input('appointmenttime')
+        ])->first();
+
+        if ($existingAppointment) {
+            return redirect()->back()->withErrors(['appointmenttime' => 'This time is already booked. Could you please select a different time?']);
+        }
+
         Calendar::create([
+            'dentalclinic_id' => $request->dentalclinic_id,
             'user_id' => $request->input('user_id'),
             'appointmentdate' => $request->input('appointmentdate'),
             'appointmenttime' => $request->input('appointmenttime'),
+            'concern' => $request->input('concern'),
             'name' => $request->input('name'),
             'gender' => $request->input('gender'),
             'birthday' => $request->input('birthday'),
@@ -88,8 +125,8 @@ class PatientCalendarController extends Controller
             'user_id' => 'required|exists:user,id',
             'appointmentdate' => 'required|date',
             'appointmenttime' => 'required|date_format:H:i',
-            'firstname' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
+            'concern' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'birthday' => 'required|date',
             'gender' => 'required|string',
             'address' => 'required|string|max:255',
@@ -107,6 +144,7 @@ class PatientCalendarController extends Controller
             'user_id' => $request->input('user_id'),
             'appointmentdate' => $request->input('appointmentdate'),
             'appointmenttime' => $request->input('appointmenttime'),
+            'concern' => $request->input('concern'),
             'name' => $request->input('name'),
             'gender' => $request->input('gender'),
             'birthday' => $request->input('birthday'),

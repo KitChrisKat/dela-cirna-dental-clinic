@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('admins', function (Blueprint $table) {
+        Schema::create('inventoryhistories', function (Blueprint $table) {
             $table->id();
-            $table->string('usertype');
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->foreignId('inventory_id')->constrained('inventories')->onDelete('cascade');
+            $table->integer('quantity');
+            $table->string('action'); // 'add' or 'subtract'
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('admins');
+        Schema::dropIfExists('inventoryhistories');
     }
 };

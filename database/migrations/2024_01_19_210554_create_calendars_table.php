@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('calendars', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('dentalclinic_id')->constrained('dentalclinics')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->date('appointmentdate');
             $table->time('appointmenttime');
+            $table->string('concern');
             $table->string('name');
             $table->string('gender');
             $table->date('birthday');
@@ -29,7 +31,7 @@ return new class extends Migration
             $table->string('emergencycontactphone');
             $table->string('relationname')->nullable();
             $table->string('relation')->nullable();
-            $table->boolean('approved')->default(false);
+            $table->string('approved')->default('Pending Approval');
             $table->timestamps();
         });
     }

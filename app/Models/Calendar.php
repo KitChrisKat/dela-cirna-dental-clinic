@@ -9,9 +9,11 @@ class Calendar extends Model
     protected $table = 'calendars';
 
     protected $fillable = [
+        'dentalclinic_id',
         'user_id',
         'appointmentdate',
         'appointmenttime',
+        'concern',
         'name',
         'gender',
         'birthday',
@@ -27,6 +29,15 @@ class Calendar extends Model
         'relation',
         'approved',
     ];
+
+    // Accessor for appointment status
+    public function getStatusAttribute(){
+        return $this->approved;
+    }
+
+    public function dentalclinic(){
+        return $this->belongsTo(DentalClinic::class, 'dentalclinic_id');
+    }
 
     public function user(){
         return $this->belongsTo(User::class);

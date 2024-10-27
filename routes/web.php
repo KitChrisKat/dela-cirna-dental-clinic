@@ -12,7 +12,7 @@ use App\Http\Controllers\admin\AdminPaymentInfoController;
 use App\Http\Controllers\admin\AdminCalendarController;
 use App\Http\Controllers\admin\AdminCommunityForumController;
 use App\Http\Controllers\admin\AdminCommentController;
-
+use App\Http\Controllers\DentalClinicController;
 // patient
 use App\Http\Controllers\patient\PatientDashboardController;
 use App\Http\Controllers\patient\PatientAppointmentController;
@@ -41,6 +41,12 @@ use App\Http\Controllers\WelcomeController;
 |
 */
 
+
+// Create Multiple Clinic
+Route::get('/dentalclinics', [DentalClinicController::class, 'create'])->name('dentalclinics.create');
+Route::post('/dentalclinics/store', [DentalClinicController::class, 'store'])->name('dentalclinics.store');
+
+
 Route::group(['middleware' => ['auth', 'checkUserType:admin']], function () {
     // dashboard
     Route::get('/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
@@ -60,7 +66,7 @@ Route::group(['middleware' => ['auth', 'checkUserType:admin']], function () {
     Route::get('/admin/patientlist/{patientlistId}/records', [AdminRecordController::class, 'showRecord'])->name('admin.showRecord');
     Route::get('/admin/patientlist/{patientlistId}/records/add', [AdminRecordController::class, 'createRecord'])->name('admin.record.create');
     Route::post('/admin/patientlist/{patientlistId}/records/store', [AdminRecordController::class, 'storeRecord'])->name('admin.record.store');
-    Route::get('/admin/patientlist/{patientlistId}/records/{recordId}/update', [AdminRecordController::class, 'updateRecord'])->name('admin.updateRecord');
+    
     Route::put('/admin/patientlist/{patientlistId}/records/{recordId}/updated', [AdminRecordController::class, 'updatedRecord'])->name('admin.record.update');
     Route::delete('/admin/patientlist/{patientlistId}/records/{recordId}/delete', [AdminRecordController::class, 'deleteRecord'])->name('admin.deleteRecord');
     Route::get('/admin/patientlist/{patientlistId}/records/{recordId}/download', [AdminRecordController::class, 'downloadRecord'])->name('admin.downloadRecord');
@@ -68,8 +74,7 @@ Route::group(['middleware' => ['auth', 'checkUserType:admin']], function () {
     
     Route::get('/admin/patientlist/{patientlistId}/records/note/add', [AdminRecordController::class, 'createNote'])->name('admin.note.create');
     Route::post('/admin/patientlist/{patientlistId}/records/note/store', [AdminRecordController::class, 'storeNote'])->name('admin.note.store');
-    
-    Route::get('/admin/patientlist/{patientlistId}/records/calendar/{Id}/details', [AdminRecordController::class, 'showRecords']);
+    Route::put('/admin/patientlist/{patientlistId}/records/note/{noteId}', [AdminRecordController::class, 'update'])->name('admin.note.update');
 
     // messages
     Route::get('/admin/messages',[AdminMessagesController::class,'index'])->name('admin.messages');
@@ -78,15 +83,14 @@ Route::group(['middleware' => ['auth', 'checkUserType:admin']], function () {
     
     // payment info
     Route::get('/admin/paymentinfo',[AdminPaymentInfoController::class,'index'])->name('admin.paymentinfo');
-    Route::get('/admin/payment/add', [AdminPaymentInfoController::class, 'createPayment'])->name('admin.payment.create');
-    Route::post('/admin/payment/store', [AdminPaymentInfoController::class, 'storePayment'])->name('admin.payment.store');
-    Route::post('/admin/payment/patient/{patientlistId}', [AdminPaymentInfoController::class, 'addPayment'])->name('admin.addPayment');
-    Route::get('/admin/payment/update/{id}', [AdminPaymentInfoController::class, 'updatePayment'])->name('admin.updatePayment');
-    Route::put('/admin/payment/updated/{id}', [AdminPaymentInfoController::class, 'updatedPayment'])->name('admin.updatedPayment');
-    Route::delete('/admin/payment/delete/{id}', [AdminPaymentInfoController::class, 'deletePayment'])->name('admin.deletePayment');
-    
-    Route::get('/admin/payment/search', [AdminPaymentInfoController::class, 'search'])->name('admin.paymentinfo.search');
-
+    Route::get('/admin/paymentinfo/add', [AdminPaymentInfoController::class, 'createPayment'])->name('admin.payment.create');
+    Route::post('/admin/paymentinfo/store', [AdminPaymentInfoController::class, 'storePayment'])->name('admin.payment.store');
+    Route::get('/admin/paymentinfo/update/{paymentId}', [AdminPaymentInfoController::class, 'updatePayment'])->name('admin.updatePayment');
+    Route::put('/admin/paymentinfo/updated/{paymentId}', [AdminPaymentInfoController::class, 'updatedPayment'])->name('admin.updatedPayment');
+    Route::delete('/admin/paymentinfo/delete/{paymentId}', [AdminPaymentInfoController::class, 'deletePayment'])->name('admin.deletePayment');
+    Route::get('/admin/paymentinfo/search', [AdminPaymentInfoController::class, 'search'])->name('admin.paymentinfo.search');
+    Route::post('/admin/paymentinfo/addpayment/{paymentId}', [AdminPaymentInfoController::class, 'addPayment'])->name('admin.addPayment');
+    Route::get('/admin/paymentinfo/{paymentId}/history', [AdminPaymentInfoController::class, 'paymentHistory'])->name('admin.paymentHistory');
     // calendar
     Route::get('/admin/calendar',[AdminCalendarController::class,'index'])->name('admin.calendar');
     Route::post('/calendar/approve/{id}', [AdminCalendarController::class, 'approve'])->name('admin.approveCalendar');
@@ -126,14 +130,8 @@ Route::group(['middleware' => ['auth', 'checkUserType:patient']], function () {
     Route::get('/patient/messages/search', [PatientMessagesController::class, 'search'])->name('patient.messages.search');
     // payment info
     Route::get('/patient/paymentinfo',[PatientPaymentInfoController::class,'index'])->name('patient.paymentinfo');
-    Route::get('/patient/payment/add', [PatientPaymentInfoController::class, 'createPayment'])->name('patient.payment.create');
-    Route::post('/patient/payment/store', [PatientPaymentInfoController::class, 'storePayment'])->name('patient.payment.store');
-    Route::post('/patient/payment/patient/{patientlistId}', [PatientPaymentInfoController::class, 'patient.addPayment'])->name('addPayment');
-    Route::get('/patient/payment/update/{id}', [PatientPaymentInfoController::class, 'updatePayment'])->name('patient.updatePayment');
-    Route::put('/patient/payment/updated/{id}', [PatientPaymentInfoController::class, 'updatedPayment'])->name('patient.updatedPayment');
-    Route::delete('/patient/payment/delete/{id}', [PatientPaymentInfoController::class, 'deletePayment'])->name('patient.deletePayment');
-    
     Route::get('/patient/payment/search', [PatientPaymentInfoController::class, 'search'])->name('patient.paymentinfo.search');
+    Route::get('/patient/paymentinfo/{paymentId}/history', [PatientPaymentInfoController::class, 'paymentHistory'])->name('patient.paymentHistory');
     // calendar
     Route::get('/patient/calendar',[PatientCalendarController::class,'index'])->name('patient.calendar');
     Route::get('/patient/calendar/appointment/update/{id}', [PatientCalendarController::class, 'updateCalendar'])->name('patient.updateCalendar');

@@ -5,36 +5,36 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
+                    @php
+                        $dentalclinic = Auth::check() ? Auth::user()->dentalclinic : null;
+                    @endphp
+
                     @auth
                         @if(Auth::user()->usertype == 'admin')
                             <a href="{{ route('admin.dashboard') }}">
-                                <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                                <img src="{{ asset('logos/' . $dentalclinic->logo) }}" alt="Clinic Logo" class="h-12 md:h-14 lg:h-16 w-auto" />
                             </a>
                         @elseif(Auth::user()->usertype == 'patient')
                             <a href="{{ route('patient.dashboard') }}">
-                                <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                                <img src="{{ asset('logos/' . $dentalclinic->logo) }}" alt="Clinic Logo" class="h-12 md:h-14 lg:h-16 w-auto" />
                             </a>
                         @elseif(Auth::user()->usertype == 'dentistrystudent')
                             <a href="{{ route('dentistrystudent.dashboard') }}">
-                                <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                                <img src="{{ asset('logos/' . $dentalclinic->logo) }}" alt="Clinic Logo" class="h-12 md:h-14 lg:h-16 w-auto" />
                             </a>
                         @endif
-                    @else
-                        <a href="{{ route('welcome') }}">
-                            <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                        </a>
                     @endauth
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                @if(Auth::check())
+                    @if(Auth::check())
                         @if(Auth::user()->usertype == 'admin')
                             <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                                 {{ __('Dashboard') }}
                             </x-nav-link>
                             <x-nav-link :href="route('admin.patientlist')" :active="request()->routeIs('admin.patientlist')">
-                                {{ __('Patientlist') }}
+                                {{ __('Patient List') }}
                             </x-nav-link>
                             <x-nav-link :href="route('admin.messages')" :active="request()->routeIs('admin.messages')">
                                 {{ __('Messages') }}
@@ -134,7 +134,7 @@
                         {{ __('Admin Dashboard') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.patientlist')" :active="request()->routeIs('admin.patientlist')">
-                        {{ __('Patientlist') }}
+                        {{ __('Patient List') }}
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.messages')" :active="request()->routeIs('admin.messages')">
                         {{ __('Messages') }}

@@ -1,28 +1,23 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
+
+    <form action="{{ route('dentalclinics.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
+        <h2 class="text-2xl font-semibold text-center">Create Dental Clinic</h2>
+
+        <h1 class="mt-6 font-semibold">Dental Clinic Details</h1>
 
         <div class="mt-4">
-            <x-input-label for="dentalclinic_id" :value="__('Dental Clinic')" />
-            <select name="dentalclinic_id" id="dentalclinic_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="" disabled selected>Select a Dental Clinic</option>
-                @foreach($dentalclinics as $dentalclinic)
-                    <option value="{{ $dentalclinic->id }}" {{ old('dentalclinic_id') == $dentalclinic->id ? 'selected' : '' }}>{{ $dentalclinic->dentalclinicname }}</option>
-                @endforeach
-            </select>
-            <x-input-error :messages="$errors->get('dentalclinic_id')" class="mt-2" />
+            <x-input-label for="logo" :value="__('Logo')" />
+            <input type="file" name="logo" accept="image/*" class="block mt-1 w-full" required>
+            <x-input-error :messages="$errors->get('logo')" class="mt-2" />
+        </div>
+        <div class="mt-4">
+            <x-input-label for="dentalclinicname" :value="__('Name')" />
+            <input type="text" id="dentalclinicname" name="dentalclinicname" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2" value="{{ old('dentalclinicname') }}" required>
+            <x-input-error :messages="$errors->get('dentalclinicname')" class="mt-2" />
         </div>
 
-        <!-- User Type -->
-        <div class="mt-4">
-            <x-input-label for="usertype" :value="__('User Type')" />
-            <select id="usertype" name="usertype" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                <option value="" disabled selected>Select your User Type</option>
-                <option value="patient" {{ old('usertype') == 'patient' ? 'selected' : '' }}>{{ __('Patient') }}</option>
-                <option value="dentistrystudent" {{ old('usertype') == 'dentistrystudent' ? 'selected' : '' }}>{{ __('Dentistry Student') }}</option>
-            </select>
-            <x-input-error :messages="$errors->get('usertype')" class="mt-2" />
-        </div>
+        <h1 class="mt-6 font-semibold">Admin Account Details</h1>
 
         <!-- Name -->
         <div class="mt-4">
@@ -63,9 +58,9 @@
 
         <div class="mt-4">
             <x-input-label for="gender" :value="__('Gender')" />
-            <select id="gender" name="gender" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+            <select id="gender" name="gender" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                 <option value="" disabled selected>Select your Gender</option>
-                <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }}>Male</option>
+                <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }} >Male</option>
                 <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>Female</option>
             </select>
             <x-input-error :messages="$errors->get('gender')" class="mt-2" />
@@ -79,33 +74,23 @@
 
         <div class="mt-4">
             <x-input-label for="age" :value="__('Age')" />
-            <input type="number" id="age" name="age" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" value="{{ old('age') }}" required>
+            <input type="number" id="age" name="age" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" value="{{ old('age') }}"  required>
             <x-input-error :messages="$errors->get('age')" class="mt-2" />
         </div>
 
         <div class="mt-4">
             <x-input-label for="address" :value="__('Address')" />
-            <input type="text" id="address" name="address" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" value="{{ old('address') }}" required>
+            <input type="text" id="address" name="address" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" value="{{ old('address') }}"  required>
             <x-input-error :messages="$errors->get('address')" class="mt-2" />
         </div>
 
-        <div  class="mt-4">
+        <div class="mt-4">
             <x-input-label for="phone" :value="__('Phone No.')" />
-            <input type="tel" id="phone" name="phone" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" value="{{ old('phone') }}" required>
+            <input type="tel" id="phone" name="phone" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" value="{{ old('phone') }}"  required>
             <x-input-error :messages="$errors->get('phone')" class="mt-2" />
         </div>
 
-        <div class="mt-4">
-            <x-primary-button class="w-full justify-center bg-blue-600 hover:bg-blue-800">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-        
-        <div class="text-center mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already have an account? Log In') }}
-            </a>
-        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition duration-200 mt-4">Create Clinic</button>
     </form>
 
     <script>
@@ -139,6 +124,7 @@
     </script>
 
 @section('title')
-    Register
+    Create Clinic
 @endsection
+
 </x-guest-layout>

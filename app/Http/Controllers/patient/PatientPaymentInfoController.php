@@ -20,12 +20,20 @@ class PatientPaymentInfoController extends Controller
         $query = $request->input('query');
         $paymentinfo = PaymentInfo::where('users_id', Auth::id())
             ->where(function($q) use ($query) {
-                $q->where('description', 'like', "%$query%")
+                $q->where('concern', 'like', "%$query%")
                   ->orWhere('amount', 'like', "%$query%")
                   ->orWhere('balance', 'like', "%$query%")
                   ->orWhere('date', 'like', "%$query%");
             })->paginate(10);
 
         return view('patient.paymentinfo.paymentinfo', compact('paymentinfo'));
+    }
+
+    public function paymentHistory($paymentId){
+        
+        $paymentInfo = PaymentInfo::with('payments')->findOrFail($paymentId);
+        $paymenthistories = $paymentInfo->payments;
+
+        return view('patient.paymentinfo.paymenthistories', compact('paymenthistories', 'paymentInfo'));
     }
 }

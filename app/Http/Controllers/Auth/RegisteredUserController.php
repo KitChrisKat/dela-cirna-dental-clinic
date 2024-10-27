@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\DentalClinic;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
@@ -20,7 +21,9 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
+        // Retrieve dental clinics
+        $dentalclinics = DentalClinic::all();
+        return view('auth.register', compact('dentalclinics'));
     }
 
     /**
@@ -31,17 +34,29 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
+            'dentalclinic_id' => ['required', 'exists:dentalclinics,id'],
             'usertype' => ['required', 'string', 'in:patient,dentistrystudent'], // Add validation for usertype
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'gender' => ['required', 'string'],
+            'birthday' => ['required', 'date'],
+            'age' => ['required', 'integer'],
+            'address' => ['required', 'string'],
+            'phone' => ['required', 'string', 'regex:/^0[0-9]{10}$/'],
         ]);
 
         $user = User::create([
+            'dentalclinic_id' => $request->dentalclinic_id,
             'usertype' => $request->usertype, // Store usertype
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'gender' => $request->gender,
+            'birthday' => $request->birthday,
+            'age' => $request->age,
+            'address' => $request->address,
+            'phone' => $request->phone,
         ]);
 
         event(new Registered($user));
@@ -57,7 +72,7 @@ class RegisteredUserController extends Controller
                 return redirect()->route('patient.dashboard');
                 break;
             case 'dentistrystudent':
-                return redirect()->route('dentistrystudent.communityforum');
+                return redirect()->route('dentistrystudent.dashboard');
                 break;
             default:
                 return redirect(RouteServiceProvider::HOME);
